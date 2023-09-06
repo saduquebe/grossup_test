@@ -14,3 +14,5 @@ curl --location 'http://127.0.0.1:8000/' \
 --form 'file=@"PATH_TO_FILE/test.csv"'
 ```
 and use the test.csv file that lives under the root folder of this project
+
+![alt text](https://github.com/saduquebe/grossup_test/blob/master/postman_poc.png?raw=true)
