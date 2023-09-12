@@ -41,4 +41,4 @@ class WithholdingTaxSerializer(serializers.ModelSerializer):
 class SocialSecuritySerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialSecurity
-        fields = ['employee_id', 'company']
+        fields = '__all__'
