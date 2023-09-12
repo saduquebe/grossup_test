@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 class WithholdingTax(models.Model):
@@ -17,7 +18,7 @@ class WithholdingTax(models.Model):
     final_date_contract = models.DateField()
     housing_relief = models.IntegerField()
     health_relief = models.IntegerField()
-    housing_relief_cap =  models.IntegerField()
+    housing_relief_cap = models.IntegerField()
     health_relief_cap = models.IntegerField()
     uvt_value = models.IntegerField()
     non_constitutive_incomes_cap = models.IntegerField()
@@ -36,7 +37,6 @@ class WithholdingTax(models.Model):
     dependent_percentage = models.DecimalField(max_digits=10, decimal_places=2)
 
 
-
 class SocialSecurity(models.Model):
     wage_income = models.IntegerField()
     unearned_income = models.IntegerField()
@@ -50,6 +50,12 @@ class SocialSecurity(models.Model):
     health_contribute = models.BooleanField()
     health_percentage = models.DecimalField(max_digits=10, decimal_places=2)
     pension_contribute = models.BooleanField()
-    pension_percentage = models.DecimalField(max_digits=10, decimal_places=2)   
+    pension_percentage = models.DecimalField(max_digits=10, decimal_places=2)
     worked_days = models.IntegerField()
     salary_limit = models.IntegerField()
+
+
+class Employee:
+    def __init__(self, social_security, withholding_tax):
+        self.social_security = social_security
+        self.withholding_tax = withholding_tax
