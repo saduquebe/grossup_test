@@ -13,7 +13,7 @@ from v1_process.services.withholding_tax_service import WithholdingTaxService
 
 @csrf_exempt
 def exec_excel_pipeline(request):
-    if(request.method == 'POST'):
+    if request.method == 'POST':
         
         file = request.FILES['file'] 
         decoded_file = file.read().decode('utf-8').splitlines()
@@ -25,13 +25,13 @@ def exec_excel_pipeline(request):
         Populate with data from the serialization
         It should be a list of objects to inject to the services layer
         """
-        ss_service = SocialSecurityService(100000, 8004084)
-        wt_service = WithholdingTaxService(True, 0)
-        
-        #This service should be used only for excecution of the main process, and the rest of the logic should live within the GrossUpService
-        gross_up_service = GrossUpService(ss_service, wt_service)
-        
-        return_csv = gross_up_service.exec()
+        # ss_service = SocialSecurityService(100000, 8004084)
+        # wt_service = WithholdingTaxService(True, 0)
+        #
+        # #This service should be used only for excecution of the main process, and the rest of the logic should live within the GrossUpService
+        # gross_up_service = GrossUpService(ss_service, wt_service)
+        #
+        # return_csv = gross_up_service.exec()
         
         
         """data = JSONParser().parse(request)
@@ -41,7 +41,7 @@ def exec_excel_pipeline(request):
         else:
             print('Error in serialization')"""
     
-    return HttpResponse(return_csv)
+    return HttpResponse()
 
 @csrf_exempt
 def exec_database_pipeline(request):
