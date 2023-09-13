@@ -15,7 +15,7 @@ class GrossUpService:
         return attr
 
     def exec(self) -> str:
-        return "Llamado exitoso" , {self.social_security_service.employee_id}
+        return #"Llamado exitoso" , {self.social_security_service.employee_id}
     
     def _save_to_database():
         #Logic to connect to Model class and persist data

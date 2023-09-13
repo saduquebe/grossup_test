@@ -15,7 +15,7 @@ def get_base_law_1393(top_law_1393, unearned_income, paid_vacations, wage_income
       excess_law_1393 = unearned_income - cap_40
     return cap_40, excess_law_1393
 
-def ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
+def get_ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
         ibc_vacations, integral_percentage_salary, smlv, regime_type,
         worked_days, salary_limit):
   cap_40, excess_law_1393=get_base_law_1393(top_law_1393, unearned_income,
@@ -50,7 +50,7 @@ def get_contributions(wage_income, top_law_1393, unearned_income, paid_vacations
                   health_contribute, health_percentage, pension_contribute,
                   pension_percentage, voluntary_mandatory_pension, worked_days,
                   salary_limit, ranges):
-  base, bounded_base_sup, bounded_base_inf = ibc(wage_income, top_law_1393,
+  base, bounded_base_sup, bounded_base_inf = get_ibc(wage_income, top_law_1393,
                                                  unearned_income,paid_vacations,
                                                  ibc_vacations,
                                                  integral_percentage_salary,
@@ -77,16 +77,44 @@ Service to access namespace
 Fill this service with a list of SocialSecurity objects  
 """
 class SocialSecurityService:
+    
+    def __init__(self, wage_income, top_law_1393, unearned_income, paid_vacations, ibc_vacations,
+                 integral_percentage_salary, smlv, regime_type, health_contribute, health_percentage,
+                 pension_contribute, pension_percentage, voluntary_mandatory_pension, worked_days,salary_limit):
+        self.wage_income = wage_income
+        self.top_law_1393 = top_law_1393
+        self.unearned_income = unearned_income
+        self.paid_vacations = paid_vacations
+        self.ibc_vacations = ibc_vacations
+        self.integral_percentage_salary = integral_percentage_salary
+        self.smlv = smlv
+        self.regime_type = regime_type
+        self.health_contribute = health_contribute
+        self.health_percentage = health_percentage
+        self.pension_contribute = pension_contribute
+        self.pension_percentage = pension_percentage
+        self.voluntary_mandatory_pension = voluntary_mandatory_pension
+        self.worked_days = worked_days
+        self.salary_limit=salary_limit
 
-    def exec(socialsecurity):
-       return get_contributions(socialsecurity.wage_income, socialsecurity.top_law_1393, 
+    def exec(socialsecurity,ranges):
+      healthAport,retireAport,fsp,p_obligatoria= get_contributions(socialsecurity.wage_income, socialsecurity.top_law_1393, 
                                 socialsecurity.unearned_income, socialsecurity.paid_vacations,
                                 socialsecurity.ibc_vacations, socialsecurity.integral_percentage_salary, 
                                 socialsecurity.smlv, socialsecurity.regime_type,
                                 socialsecurity.health_contribute, socialsecurity.health_percentage, 
                                 socialsecurity.pension_contribute, socialsecurity.pension_percentage, 
                                 socialsecurity.voluntary_mandatory_pension, socialsecurity.worked_days,
-                                socialsecurity.salary_limit, socialsecurity.ranges)
+                                socialsecurity.salary_limit, ranges)
+      socialSecValues = {
+        "healthAport" : int(healthAport),
+        "retireAport" : int(retireAport),
+        "solidarityAport" : int(fsp),
+        "voluntaryMandatoryPension" : int(p_obligatoria)
+      }
+      #print(socialSecValues)
+      return socialSecValues
+    
     
     def _save_to_database():
       #Logic to connect to Model class and persist data
