@@ -28,7 +28,7 @@ def exec_excel_pipeline(request):
         employees = load_company_employees_data(reader_company_data, reader_employee_data)
 
         gross_up_service = GrossUpService(employees)
-        #TODO: gross_up_service.exec()
+        gross_up_service.exec()
 
     return HttpResponse()
 

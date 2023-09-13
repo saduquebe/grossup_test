@@ -1,65 +1,74 @@
 """
 Define if these are methods or functions (instance related or not) to define a class
 """
+from v1_process.models import WithholdingTax
+from v1_process.dictionaries.dictionary import *
+
+
 def get_worked_days(payroll_date, initial_date_contract, final_date_contract):
     payroll_date_splited = payroll_date.split('-')
     initial_date_splited = initial_date_contract.split('-')
     final_date_splited = final_date_contract.split('-')
 
     if (
-        int(payroll_date_splited[0]) == int(initial_date_splited[0])
-        and int(payroll_date_splited[1]) == int(initial_date_splited[1])
+            int(payroll_date_splited[0]) == int(initial_date_splited[0])
+            and int(payroll_date_splited[1]) == int(initial_date_splited[1])
     ):
         return 30 - int(initial_date_splited[2])
 
     if (
-        int(payroll_date_splited[0]) == int(final_date_splited[0])
-        and int(payroll_date_splited[1]) == int(final_date_splited[1])
+            int(payroll_date_splited[0]) == int(final_date_splited[0])
+            and int(payroll_date_splited[1]) == int(final_date_splited[1])
     ):
         return int(final_date_splited[2])
 
     return 30
-    
+
+
 def project(value, procedure_type, worked_days):
     if procedure_type == "T":
         return (value / worked_days) * 30
     return value
+
 
 def evaluate_cap(value, cap):
     if value > cap:
         return cap
     return value
 
+
 def get_table_value(base, table, uvt_value):
     for rank in table:
         if rank["min"] * uvt_value < base and base < rank["max"] * uvt_value:
             return (
-                (base - rank["subsValue"] * uvt_value) * rank["percentage"] +
-                rank["addValue"] * uvt_value
+                    (base - rank["subsValue"] * uvt_value) * rank["percentage"] +
+                    rank["addValue"] * uvt_value
             )
     last_rank = table[len(table) - 1]
     return (
-        (base - last_rank["subsValue"] * uvt_value) * last_rank["percentage"] +
-        last_rank["addValue"] * uvt_value
+            (base - last_rank["subsValue"] * uvt_value) * last_rank["percentage"] +
+            last_rank["addValue"] * uvt_value
     )
 
+
 def calculate_month_withholding_tax_value(
-    base, procedure_type, argument, uvt_value, worked_days
+        base, procedure_type, argument, uvt_value, worked_days
 ):
     if procedure_type == "T":
         return (get_table_value(base, argument, uvt_value) / 30) * worked_days
     else:
         return base * argument
 
+
 def calculate_non_constitutive_incomes(
-    non_constitutive_incomes_cap, minimum_month_salary, social_security_values,
-    procedure_type, worked_days
+        non_constitutive_incomes_cap, minimum_month_salary, social_security_values,
+        procedure_type, worked_days
 ):
     total_social_security_values = (
-        social_security_values["healthAport"]
-        + social_security_values["retireAport"]
-        + social_security_values["solidarityAport"]
-        + social_security_values["voluntaryMandatoryPension"]
+            social_security_values[HEALTH_CONTRIBUTION]
+            + social_security_values[RETIRE_CONTRIBUTION]
+            + social_security_values[SOLIDARITY_CONTRIBUTION]
+            + social_security_values[VOLUNTARY_MANDATORY_PENSION_CONTRIBUTION]
     )
 
     total_social_security_values_projected = project(
@@ -71,14 +80,15 @@ def calculate_non_constitutive_incomes(
         non_constitutive_incomes_cap * minimum_month_salary
     )
 
+
 # At 2023 this function gets the exemptio value of 25%(Tope 25%)
 def get_exemption(
-    periodicity, gross_exempt, total_reliefs, voluntary_withholding,
-    exempt_percentage, annual_exempt_cap, accumulated_exemption, uvt_value
+        periodicity, gross_exempt, total_reliefs, voluntary_withholding,
+        exempt_percentage, annual_exempt_cap, accumulated_exemption, uvt_value
 ):
     month_exemption = (
-        gross_exempt - total_reliefs - voluntary_withholding
-    ) * exempt_percentage
+                              gross_exempt - total_reliefs - voluntary_withholding
+                      ) * exempt_percentage
 
     if periodicity == "A":
         remainder = annual_exempt_cap - accumulated_exemption
@@ -89,10 +99,11 @@ def get_exemption(
         monthly_cap = annual_exempt_cap / 12
         return evaluate_cap(month_exemption, monthly_cap)
 
+
 # At 2023 this function gets the deductible value of 40%(Tope 40%)
 def get_deductible(
-    periodicity, gross_exempt, deductible_percentage,
-    annual_deductible_cap, accumulated_deductible, uvt_value
+        periodicity, gross_exempt, deductible_percentage,
+        annual_deductible_cap, accumulated_deductible, uvt_value
 ):
     month_deductible = gross_exempt * deductible_percentage
     if periodicity == "A":
@@ -104,13 +115,16 @@ def get_deductible(
         monthly_cap = annual_deductible_cap / 12
         return evaluate_cap(month_deductible, monthly_cap)
 
+
 """
 Service to access namespace 
 Fill this service with a list of WithholdingTax objects 
 """
+
+
 class WithholdingTaxService:
 
-    def exec(withholding_tax):
+    def exec(self, withholding_tax: WithholdingTax):
         # Calculate the working days by the contract
         worked_days = get_worked_days(
             withholding_tax.payroll_date,
@@ -145,7 +159,7 @@ class WithholdingTaxService:
             voluntary_withholding_projected, final_voluntary_withholding_cap
         )
 
-        # Calculate the non-constitutive incomes (ingresos no constitutivos de 
+        # Calculate the non-constitutive incomes (ingresos no constitutivos de
         # renta)
         non_constitutive_incomes = calculate_non_constitutive_incomes(
             withholding_tax.non_constitutive_incomes_cap,
@@ -157,8 +171,8 @@ class WithholdingTaxService:
 
         # Calculate the gross exempt (renta bruta exenta)
         gross_exempt = (
-            total_incomes - non_constitutive_incomes + 
-            withholding_tax.food_bonus
+                total_incomes - non_constitutive_incomes +
+                withholding_tax.food_bonus
         )
 
         # Calculate the housing and health reliefs (Alivios de vivienda y salud)
@@ -175,8 +189,8 @@ class WithholdingTaxService:
         dependent_relief = 0
         if withholding_tax.dependent:
             weighted_dependent_relief = (
-                withholding_tax.dependent_sum * 
-                withholding_tax.dependent_percentage
+                    withholding_tax.dependent_sum *
+                    withholding_tax.dependent_percentage
             )
             dependent_relief_projected = project(
                 weighted_dependent_relief,
@@ -190,10 +204,10 @@ class WithholdingTaxService:
 
         # Calculate the total value of the reliefs
         total_reliefs = final_housing_relief + (
-            final_health_relief + dependent_relief
+                final_health_relief + dependent_relief
         )
 
-        # Calculate the gross cap exemption (Tope 25%)
+        # Calculate the gross cap exemption (Cap 25%)
         gross_cap_exemption = get_exemption(
             withholding_tax.exempts_periodicity,
             gross_exempt,
@@ -205,7 +219,7 @@ class WithholdingTaxService:
             withholding_tax.uvt_value
         )
 
-        # Calculate the gross cap deductible (Tope 40%)
+        # Calculate the gross cap deductible (Cap 40%)
         gross_cap_exemption_2 = get_deductible(
             withholding_tax.exempts_periodicity,
             gross_exempt,
@@ -216,7 +230,7 @@ class WithholdingTaxService:
         )
 
         # Calculate the withholding base
-        withholding_base = gross_exempt - min(gross_cap_exemption, 
+        withholding_base = gross_exempt - min(gross_cap_exemption,
                                               gross_cap_exemption_2)
 
         # Calculate the monthly withholding tax
@@ -229,7 +243,7 @@ class WithholdingTaxService:
         )
 
         return monthly_withholding
-    
-    def _save_to_database():
-        #Logic to connect to Model class and persist data
+
+    def _save_to_database(self):
+        # Logic to connect to Model class and persist data
         return
