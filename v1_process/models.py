@@ -18,7 +18,7 @@ class WithholdingTax(models.Model):
     final_date_contract = models.DateField()
     housing_relief = models.IntegerField()
     health_relief = models.IntegerField()
-    housing_relief_cap = models.IntegerField()
+    housing_relief_cap =  models.IntegerField()
     health_relief_cap = models.IntegerField()
     uvt_value = models.IntegerField()
     non_constitutive_incomes_cap = models.IntegerField()
@@ -56,6 +56,9 @@ class SocialSecurity(models.Model):
 
 
 class Employee:
-    def __init__(self, social_security, withholding_tax):
+    target_salary = models.IntegerField()
+    def __init__(self, social_security: SocialSecurity, 
+        withholding_tax: WithholdingTax, target_salary: float):
         self.social_security = social_security
         self.withholding_tax = withholding_tax
+        self.target_salary = target_salary
