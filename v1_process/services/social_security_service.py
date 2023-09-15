@@ -4,12 +4,12 @@ Define if these are methods or functions (instance related or not) to define a c
 from v1_process.models import SocialSecurity
 from v1_process.dictionaries.dictionary import *
 
-
+# Calculate total income
 def get_income_calculation(wage_income, unearned_income, paid_vacations):
     total_incomes = wage_income + unearned_income + paid_vacations
     return total_incomes
 
-
+# Calculate base according to Law 1393
 def get_base_law_1393(top_law_1393, unearned_income, paid_vacations, wage_income):
     total_incomes = get_income_calculation(wage_income, unearned_income, paid_vacations)
     cap_40 = total_incomes * top_law_1393
@@ -19,7 +19,7 @@ def get_base_law_1393(top_law_1393, unearned_income, paid_vacations, wage_income
         excess_law_1393 = unearned_income - cap_40
     return cap_40, excess_law_1393
 
-
+# Calculate Integral Base of Contribution (IBC)
 def get_ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
             ibc_vacations, integral_percentage_salary, smlv, regime_type,
             worked_days, salary_limit):
@@ -43,7 +43,8 @@ def get_ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
         bounded_base_inf = bounded_base_sup
     return base, bounded_base_sup, bounded_base_inf
 
-
+# Get the solidarity percentage from a table of ranges
+# Table of ranges is defined in utils
 def get_solidarity_percentage_table(bounded_base, smlv, ranges):
     for start, end, percentage in ranges:
         if bounded_base >= smlv * start and bounded_base < smlv * end:
@@ -51,7 +52,7 @@ def get_solidarity_percentage_table(bounded_base, smlv, ranges):
 
     return 0
 
-
+# Calculate social contributions
 def get_contributions(wage_income, top_law_1393, unearned_income, paid_vacations,
                       ibc_vacations, integral_percentage_salary, smlv, regime_type,
                       health_contribute, health_percentage, pension_contribute,
@@ -85,7 +86,7 @@ Service to access namespace
 Fill this service with a list of SocialSecurity objects  
 """
 
-
+# Class to access the social security service
 class SocialSecurityService:
     '''
 
@@ -108,6 +109,7 @@ class SocialSecurityService:
         self.worked_days = worked_days
         self.salary_limit = salary_limit'''
 
+    # Method to execute the service
     def exec(self, social_security: SocialSecurity, ranges):
         health_contribution, retire_contribution, fsp, mandatory_voluntary_pension = get_contributions(
             social_security.wage_income,
