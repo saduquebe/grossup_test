@@ -124,6 +124,7 @@ Fill this service with a list of WithholdingTax objects
 
 class WithholdingTaxService:
 
+    def exec(self, WithholdingTax: withholding_tax) -> float:
     def exec(self, withholding_tax: WithholdingTax):
         # Calculate the working days by the contract
         worked_days = get_worked_days(
