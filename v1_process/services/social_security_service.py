@@ -1,17 +1,21 @@
 """
-Define if these are methods or functions (instance related or not) to define a class
+Define if these are methods or functions (instance related or not) to define 
+a class
 """
 from v1_process.models import SocialSecurity
 from v1_process.dictionaries.dictionary import *
 
 # Calculate total income
-def get_income_calculation(wage_income, unearned_income, paid_vacations):
+def get_income_calculation(wage_income: float, unearned_income: float, 
+                           paid_vacations: float)-> float:
     total_incomes = wage_income + unearned_income + paid_vacations
     return total_incomes
 
 # Calculate base according to Law 1393
-def get_base_law_1393(top_law_1393, unearned_income, paid_vacations, wage_income):
-    total_incomes = get_income_calculation(wage_income, unearned_income, paid_vacations)
+def get_base_law_1393(top_law_1393: float, unearned_income: float, 
+                      paid_vacations: float, wage_income: float)-> float:
+    total_incomes = get_income_calculation(wage_income, unearned_income, 
+                                           paid_vacations)
     cap_40 = total_incomes * top_law_1393
     if (unearned_income - cap_40) < 0:
         excess_law_1393 = 0
@@ -20,9 +24,11 @@ def get_base_law_1393(top_law_1393, unearned_income, paid_vacations, wage_income
     return cap_40, excess_law_1393
 
 # Calculate Integral Base of Contribution (IBC)
-def get_ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
-            ibc_vacations, integral_percentage_salary, smlv, regime_type,
-            worked_days, salary_limit):
+def get_ibc(wage_income: float, top_law_1393: float, unearned_income: float, 
+            paid_vacations: float,
+            ibc_vacations: float, integral_percentage_salary: float, 
+            smlv: float, regime_type: int,
+            worked_days: int, salary_limit: int)-> float:
     cap_40, excess_law_1393 = get_base_law_1393(top_law_1393, unearned_income,
                                                 paid_vacations, wage_income)
     if regime_type == 1:
@@ -45,7 +51,8 @@ def get_ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
 
 # Get the solidarity percentage from a table of ranges
 # Table of ranges is defined in utils
-def get_solidarity_percentage_table(bounded_base, smlv, ranges):
+def get_solidarity_percentage_table(bounded_base: float, smlv: float, 
+                                    ranges: list)-> float:
     for start, end, percentage in ranges:
         if bounded_base >= smlv * start and bounded_base < smlv * end:
             return percentage
@@ -53,19 +60,25 @@ def get_solidarity_percentage_table(bounded_base, smlv, ranges):
     return 0
 
 # Calculate social contributions
-def get_contributions(wage_income, top_law_1393, unearned_income, paid_vacations,
-                      ibc_vacations, integral_percentage_salary, smlv, regime_type,
-                      health_contribute, health_percentage, pension_contribute,
-                      pension_percentage, voluntary_mandatory_pension, worked_days,
-                      salary_limit, ranges):
-    base, bounded_base_sup, bounded_base_inf = get_ibc(wage_income, top_law_1393,
-                                                       unearned_income, paid_vacations,
+def get_contributions(wage_income: float, top_law_1393: float, 
+                      unearned_income: float, paid_vacations: float,
+                      ibc_vacations: float, integral_percentage_salary: float, 
+                      smlv: float, regime_type: int,
+                      health_contribute: bool, health_percentage: float, 
+                      pension_contribute: bool,
+                      pension_percentage: float, 
+                      voluntary_mandatory_pension: float, worked_days: int,
+                      salary_limit: int, ranges: list):
+    base, bounded_base_sup, bounded_base_inf = get_ibc(wage_income,top_law_1393,
+                                                       unearned_income, 
+                                                       paid_vacations,
                                                        ibc_vacations,
                                                        integral_percentage_salary,
-                                                       smlv, regime_type, worked_days,
+                                                       smlv, regime_type, 
+                                                       worked_days,
                                                        salary_limit)
-    percentage_solidarity = get_solidarity_percentage_table(bounded_base_sup, smlv,
-                                                            ranges)
+    percentage_solidarity = get_solidarity_percentage_table(bounded_base_sup, 
+                                                            smlv, ranges)
     if regime_type == 4 or health_contribute == False:
         health = 0
     else:
@@ -90,9 +103,12 @@ Fill this service with a list of SocialSecurity objects
 class SocialSecurityService:
     '''
 
-    def __init__(self, wage_income, top_law_1393, unearned_income, paid_vacations, ibc_vacations,
-                 integral_percentage_salary, smlv, regime_type, health_contribute, health_percentage,
-                 pension_contribute, pension_percentage, voluntary_mandatory_pension, worked_days, salary_limit):
+    def __init__(self, wage_income, top_law_1393, unearned_income, 
+                paid_vacations, ibc_vacations,  integral_percentage_salary, 
+                smlv, regime_type, health_contribute, health_percentage,
+                pension_contribute, pension_percentage, 
+                voluntary_mandatory_pension, worked_days, 
+                salary_limit):
         self.wage_income = wage_income
         self.top_law_1393 = top_law_1393
         self.unearned_income = unearned_income
@@ -110,7 +126,7 @@ class SocialSecurityService:
         self.salary_limit = salary_limit'''
 
     # Method to execute the service
-    def exec(self, social_security: SocialSecurity, ranges):
+    def exec(self, social_security: SocialSecurity, ranges: list)-> dict:
         health_contribution, retire_contribution, fsp, mandatory_voluntary_pension = get_contributions(
             social_security.wage_income,
             social_security.top_law_1393,
@@ -127,13 +143,13 @@ class SocialSecurityService:
             social_security.voluntary_mandatory_pension,
             social_security.worked_days,
             social_security.salary_limit, ranges)
-        social_sec_values = {
+        social_sec_values: dict = {
             HEALTH_CONTRIBUTION: int(health_contribution),
             RETIRE_CONTRIBUTION: int(retire_contribution),
             SOLIDARITY_CONTRIBUTION: int(fsp),
             VOLUNTARY_MANDATORY_PENSION_CONTRIBUTION: int(mandatory_voluntary_pension)
         }
-        # print(socialSecValues)
+        print(social_sec_values)
         return social_sec_values
 
     def _save_to_database(self):
