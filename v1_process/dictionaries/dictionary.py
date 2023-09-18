@@ -48,4 +48,6 @@ RETIRE_CONTRIBUTION = 'retire_contribution'
 SOLIDARITY_CONTRIBUTION = 'solidarity_contribution'
 VOLUNTARY_MANDATORY_PENSION_CONTRIBUTION = 'voluntary_mandatory_pension_contribution'
 SOCIAL_SECURITY_CAP = 'limite_base_segsoc'
+DOCUMENT = 'cedula'
+REQUIRED_VALUE = 'neto'
 

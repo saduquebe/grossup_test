@@ -19,5 +19,5 @@ def calculate_base_salary(
     base = employee.social_security.wage_income
     
     return (
-        base - sum(social_security_values.keys()) - withholding_tax_contribution
+        base - sum(social_security_values.values()) - withholding_tax_contribution
         )
