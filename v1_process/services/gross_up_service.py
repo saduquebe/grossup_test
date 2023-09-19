@@ -55,8 +55,8 @@ class GrossUpService:
                 final_employee, self.social_security_service,
                 self.withholding_tax_service
             )
-        top = base_salary + final_gross_up
-        bottom = base_salary
+        top = final_gross_up
+        bottom = 0
 
         while (
                 abs(employee.target_salary - base_salary) > self._clearance_allowed
