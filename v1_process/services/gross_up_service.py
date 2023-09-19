@@ -6,6 +6,7 @@ from v1_process.services.social_security_service import SocialSecurityService
 from v1_process.models import SocialSecurity, Employee, WithholdingTax
 from v1_process.dictionaries.table import ranges
 from v1_process.utils.calculate_base_salary import calculate_base_salary
+from copy import deepcopy
 
 
 class GrossUpService:
@@ -20,11 +21,12 @@ class GrossUpService:
             self, employee: Employee,
     ):
         final_gross_up: int = 0
-        final_employee = employee
+        final_employee = deepcopy(employee)
 
         base_salary = calculate_base_salary(
             employee, self.social_security_service, self.withholding_tax_service
         )
+
         # First stage of the binary search
         while base_salary < employee.target_salary:
 
@@ -59,7 +61,6 @@ class GrossUpService:
         while (
                 abs(employee.target_salary - base_salary) > self._clearance_allowed
         ):
-
             final_gross_up = (top + bottom) // 2
 
             # The gross up is added to social security
