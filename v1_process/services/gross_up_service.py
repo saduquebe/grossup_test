@@ -5,7 +5,6 @@ from v1_process.services.withholding_tax_service import WithholdingTaxService
 from v1_process.services.social_security_service import SocialSecurityService
 from v1_process.models import SocialSecurity, Employee, WithholdingTax
 from v1_process.dictionaries.table import ranges
-from v1_process.utils.calculate_base_salary import calculate_base_salary
 from copy import deepcopy
 
 
@@ -17,78 +16,103 @@ class GrossUpService:
         self.social_security_service = SocialSecurityService()
         self.withholding_tax_service = WithholdingTaxService()
 
-    def _gross_up(
-            self, employee: Employee,
-    ):
-        final_gross_up: int = 0
-        final_employee = deepcopy(employee)
+    def _calculate_net_salary(self,
+            employee: Employee
+                        ) -> int:
+        
+        social_security_values = self.social_security_service.exec(
+                employee.social_security, ranges)
+        
+        employee.withholding_tax.social_security_values = social_security_values
 
-        base_salary = calculate_base_salary(
-            employee, self.social_security_service, self.withholding_tax_service
-        )
+        withholding_tax_contribution = self.withholding_tax_service.exec(
+            employee.withholding_tax)
+        
+        base = employee.social_security.wage_income
+        
+        return (
+            base - sum(social_security_values.values()) - 
+            withholding_tax_contribution
+            )
+    
+    def _first_binary_search_stage(
+            self, employee: Employee
+            ):
+        
+        employee_copy = deepcopy(employee)
 
-        # First stage of the binary search
-        while base_salary < employee.target_salary:
+        net_salary = self._calculate_net_salary(employee)
 
-            if final_gross_up != 0:
-                # Increment the gross up exponentially
-                final_gross_up += final_gross_up
-            else:
-                final_gross_up = base_salary
+        top = net_salary
+        while net_salary < employee.target_salary:
+
+            # Increment the gross up exponentially
+            top += top
 
             # The gross up is added to social security
-            final_employee.social_security.wage_income = (
-                    employee.social_security.wage_income + final_gross_up
+            employee_copy.social_security.wage_income = (
+                    employee.social_security.wage_income + top
             )
             social_security_values = self.social_security_service.exec(
-                final_employee.social_security, ranges)
+                employee_copy.social_security, ranges)
 
             # The gross up is added to withholding tax
-            final_employee.withholding_tax.social_security_values = \
+            employee_copy.withholding_tax.social_security_values = \
                 social_security_values
 
-            final_employee.withholding_tax.gross_total_incomes = (
-                    employee.withholding_tax.gross_total_incomes + final_gross_up
+            employee_copy.withholding_tax.gross_total_incomes = (
+                    employee.withholding_tax.gross_total_incomes + 
+                    top
             )
-            # Recalculates the base salary
-            base_salary = calculate_base_salary(
-                final_employee, self.social_security_service,
-                self.withholding_tax_service
-            )
-        top = final_gross_up
-        bottom = 0
-
+            # Recalculates the net salary
+            net_salary = self._calculate_net_salary(employee_copy)
+        return top
+    
+    def _second_binary_search_stage(
+            self, employee: Employee, top: int, bottom: int
+            ):
+        
+        employee_copy = deepcopy(employee)
+        net_salary = self._calculate_net_salary(employee)
+        final_gross_up: int = 0
         while (
-                abs(employee.target_salary - base_salary) > self._clearance_allowed
+                abs(employee.target_salary - net_salary) > 
+                self._clearance_allowed
         ):
             final_gross_up = (top + bottom) // 2
 
             # The gross up is added to social security
-            final_employee.social_security.wage_income = (
+            employee_copy.social_security.wage_income = (
                     employee.social_security.wage_income + final_gross_up
             )
             social_security_values = self.social_security_service.exec(
-                final_employee.social_security, ranges)
+                employee_copy.social_security, ranges)
 
             # The gross up is added to withholding tax
-            final_employee.withholding_tax.social_security_values = \
+            employee_copy.withholding_tax.social_security_values = \
                 social_security_values
 
-            final_employee.withholding_tax.gross_total_incomes = (
-                    employee.withholding_tax.gross_total_incomes + final_gross_up
+            employee_copy.withholding_tax.gross_total_incomes = (
+                    employee.withholding_tax.gross_total_incomes + 
+                    final_gross_up
             )
 
-            # Recalculates the base salary
-            base_salary = calculate_base_salary(
-                final_employee, self.social_security_service,
-                self.withholding_tax_service
-            )
+            # Recalculates the net salary
+            net_salary = self._calculate_net_salary(employee_copy)
 
-            if base_salary < employee.target_salary:
+            if net_salary < employee.target_salary:
                 bottom = final_gross_up
             else:
                 top = final_gross_up
 
+    def _gross_up(
+            self, employee: Employee,
+    ):
+        # First stage of the binary search
+        top = self._first_binary_search_stage(employee)
+        bottom = self._calculate_net_salary(employee)
+        final_gross_up = self._second_binary_search_stage(employee, top, bottom)
+        
         return final_gross_up
 
     def exec(self) -> str:
