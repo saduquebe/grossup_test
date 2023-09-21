@@ -104,6 +104,7 @@ class GrossUpService:
                 bottom = final_gross_up
             else:
                 top = final_gross_up
+        return final_gross_up
 
     def _gross_up(
             self, employee: Employee,
