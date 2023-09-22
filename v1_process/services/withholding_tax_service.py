@@ -216,7 +216,7 @@ class WithholdingTaxService:
             withholding_tax.exempt_cap,
             withholding_tax.accumulated_exemption,
             withholding_tax.uvt_value
-        )
+        ) + voluntary_withholding
 
         # Calculate the gross cap deductible (Cap 40%)
         gross_cap_exemption_2 = get_deductible(
