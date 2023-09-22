@@ -1,7 +1,6 @@
 """
 Define if these are methods or functions (instance related or not) to define a class
 """
-import v1_process.dictionaries.table as tb
 from v1_process.models import WithholdingTax
 from v1_process.dictionaries.dictionary import *
 
@@ -233,20 +232,10 @@ class WithholdingTaxService:
                                               gross_cap_exemption_2)
 
         # Calculate the monthly withholding tax
-        monthly_withholding = 0
-        if withholding_tax.procedure_type == "P":
-            monthly_withholding = calculate_month_withholding_tax_value(
+        monthly_withholding = calculate_month_withholding_tax_value(
                 withholding_base,
                 withholding_tax.procedure_type,
                 withholding_tax.argument_procedure_type,
-                withholding_tax.uvt_value,
-                worked_days
-            )
-        else:
-            monthly_withholding = calculate_month_withholding_tax_value(
-                withholding_base,
-                withholding_tax.procedure_type,
-                tb.uvtTable,
                 withholding_tax.uvt_value,
                 worked_days
             )
