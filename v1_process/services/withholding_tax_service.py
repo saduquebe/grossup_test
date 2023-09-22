@@ -80,18 +80,17 @@ def calculate_non_constitutive_incomes(
         non_constitutive_incomes_cap * minimum_month_salary
     )
 
-
-# At 2023 this function gets the exemptio value of 25%(Tope 25%)
+# At 2023 this function gets the exemption value of 25%(Tope 25%)
 def get_exemption(
-        periodicity, gross_exempt, total_reliefs, voluntary_withholding,
-        exempt_percentage, annual_exempt_cap, accumulated_exemption, uvt_value
+    periodicity, gross_exempt, total_reliefs, voluntary_withholding,
+    exempt_percentage, annual_exempt_cap, accumulated_exemption, uvt_value
 ):
     month_exemption = (
-                              gross_exempt - total_reliefs - voluntary_withholding
-                      ) * exempt_percentage
-
+        gross_exempt - total_reliefs - voluntary_withholding
+    ) * exempt_percentage
+    cap_pesos = annual_exempt_cap * uvt_value
     if periodicity == "A":
-        remainder = annual_exempt_cap - accumulated_exemption
+        remainder = cap_pesos - accumulated_exemption
         if remainder <= 0:
             return 0
         return evaluate_cap(month_exemption, remainder)
@@ -99,15 +98,15 @@ def get_exemption(
         monthly_cap = annual_exempt_cap / 12
         return evaluate_cap(month_exemption, monthly_cap)
 
-
 # At 2023 this function gets the deductible value of 40%(Tope 40%)
 def get_deductible(
-        periodicity, gross_exempt, deductible_percentage,
-        annual_deductible_cap, accumulated_deductible, uvt_value
+    periodicity, gross_exempt, deductible_percentage,
+    annual_deductible_cap, accumulated_deductible, uvt_value
 ):
     month_deductible = gross_exempt * deductible_percentage
+    cap_pesos = annual_deductible_cap * uvt_value
     if periodicity == "A":
-        remainder = annual_deductible_cap - accumulated_deductible
+        remainder = cap_pesos - accumulated_deductible
         if remainder <= 0:
             return 0
         return evaluate_cap(month_deductible, remainder)

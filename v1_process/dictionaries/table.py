@@ -26,7 +26,7 @@ uvtTable = [
               {
                 "min" : 150,
                 "max" : 360,
-                "percentage" : 0.26,
+                "percentage" : 0.28,
                 "subsValue" : 150,
                 "addValue" : 10
               },
