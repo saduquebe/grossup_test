@@ -5,16 +5,16 @@ from v1_process.dictionaries.dictionary import *
 from v1_process.dictionaries.table import uvtTable
 
 
-def load_company_employees_data(company_data: DictReader, employee_data: DictReader, required_data: dict) -> list:
-    single_company_data = next(company_data)
+def load_company_employees_data(single_company_data: str, employee_data: DictReader, targets_data: dict) -> list:
+
     employees = []
     for single_employee_data in employee_data:
         social_security = map_to_social_security(single_company_data, single_employee_data)
         withholding_tax = map_to_withholding_tax(single_company_data, single_employee_data)
 
-        required_value = required_data[single_employee_data[DOCUMENT]]
+        target_salary = targets_data[single_employee_data[DOCUMENT]]
 
-        employee = Employee(social_security, withholding_tax, required_value)
+        employee = Employee(social_security, withholding_tax, target_salary, single_employee_data[DOCUMENT])
         employees.append(employee)
     return employees
 
@@ -77,8 +77,8 @@ def map_to_withholding_tax(company_data: str, single_employee_data: str) -> With
     return withholding_tax
 
 
-def map_required_data_to_dict(required_data: DictReader) -> dict:
+def map_required_data_to_dict(targets_data: DictReader) -> dict:
     required_dict = dict()
-    for row in required_data:
-        required_dict[row[DOCUMENT]] = int(row[REQUIRED_VALUE])
+    for row in targets_data:
+        required_dict[row[DOCUMENT]] = int(row[TARGET_SALARY])
     return required_dict

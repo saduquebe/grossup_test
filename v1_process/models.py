@@ -56,10 +56,16 @@ class SocialSecurity(models.Model):
 
 
 class Employee:
-    target_salary = models.IntegerField()
 
     def __init__(self, social_security: SocialSecurity,
-                 withholding_tax: WithholdingTax, target_salary: float):
+                 withholding_tax: WithholdingTax, target_salary: float, document: str):
         self.social_security = social_security
         self.withholding_tax = withholding_tax
         self.target_salary = target_salary
+        self.document = document
+
+
+class GrossUp:
+    def __init__(self, document: str, gross_up: float):
+        self.document = document
+        self.gross_up = gross_up

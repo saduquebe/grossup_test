@@ -49,5 +49,9 @@ SOLIDARITY_CONTRIBUTION = 'solidarity_contribution'
 VOLUNTARY_MANDATORY_PENSION_CONTRIBUTION = 'voluntary_mandatory_pension_contribution'
 SOCIAL_SECURITY_CAP = 'limite_base_segsoc'
 DOCUMENT = 'cedula'
-REQUIRED_VALUE = 'neto'
+TARGET_SALARY = 'neto'
+FINAL_GROSS_UP_VALUE = "valor_final_grossup"
+COMPANY_NIT = 'compania'
 
+OUTPUT_FOLDER_PATH = 'output_files/'
+OUTPUT_FILE_GENERAL_NAME = 'gross-up'
