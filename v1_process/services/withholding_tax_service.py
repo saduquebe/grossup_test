@@ -215,7 +215,7 @@ class WithholdingTaxService:
             withholding_tax.exempt_cap,
             withholding_tax.accumulated_exemption,
             withholding_tax.uvt_value
-        ) + voluntary_withholding
+        ) + voluntary_withholding + total_reliefs
 
         # Calculate the gross cap deductible (Cap 40%)
         gross_cap_exemption_2 = get_deductible(
@@ -239,8 +239,8 @@ class WithholdingTaxService:
                 withholding_tax.uvt_value,
                 worked_days
             )
-
-        return monthly_withholding
+        monthly_withholding_rounded = round(monthly_withholding / 1000) * 1000
+        return monthly_withholding_rounded
 
     def _save_to_database(self):
         # Logic to connect to Model class and persist data
