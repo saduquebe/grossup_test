@@ -6,6 +6,7 @@ from v1_process.services.social_security_service import SocialSecurityService
 from v1_process.models import SocialSecurity, Employee, WithholdingTax
 from v1_process.dictionaries.table import ranges
 from copy import deepcopy
+import time
 
 
 class GrossUpService:
@@ -121,6 +122,7 @@ class GrossUpService:
             gross_up = self._gross_up(employee)
             print("-------------")
             print(gross_up)
+            time.sleep(30)
 
     def _save_to_database(self):
         # Logic to connect to Model class and persist data
