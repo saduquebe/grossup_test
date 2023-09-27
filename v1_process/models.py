@@ -76,4 +76,7 @@ class GlobalProcessDescription:
         self._events = []
     
     def add_event(self, event: str, employee: Employee, process: str):
-        self.events.append([event, employee, process])
+        self._events.append([event, employee, process])
+    
+    def get_events(self):
+        return self._events
