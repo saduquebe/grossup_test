@@ -54,7 +54,6 @@ class SocialSecurity(models.Model):
     worked_days = models.IntegerField()
     salary_limit = models.IntegerField()
 
-
 class Employee:
 
     def __init__(self, social_security: SocialSecurity,
@@ -69,3 +68,12 @@ class GrossUp:
     def __init__(self, document: str, gross_up: float):
         self.document = document
         self.gross_up = gross_up
+
+class GlobalProcessDescription:
+    _events: list
+
+    def __init__(self):
+        self._events = []
+    
+    def add_event(self, event: str, employee: Employee, process: str):
+        self.events.append([event, employee, process])

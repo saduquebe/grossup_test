@@ -3,7 +3,7 @@ Fill this service with
 """
 from v1_process.services.withholding_tax_service import WithholdingTaxService
 from v1_process.services.social_security_service import SocialSecurityService
-from v1_process.models import Employee, GrossUp
+from v1_process.models import Employee, GrossUp, GlobalProcessDescription
 from v1_process.dictionaries.table import ranges
 from copy import deepcopy
 from v1_process.utils.csv_mapper import map_gross_up_to_csv
@@ -12,11 +12,13 @@ from v1_process.utils.csv_mapper import map_gross_up_to_csv
 class GrossUpService:
     _clearance_allowed: int = 100
 
-    def __init__(self, employees: list[Employee], company_nit: str):
+    def __init__(self, employees: list[Employee], company_nit: str, 
+                 global_process_description: GlobalProcessDescription):
         self.employees = employees
         self.social_security_service = SocialSecurityService()
         self.withholding_tax_service = WithholdingTaxService()
         self.company_nit = company_nit
+        self.global_process_description = global_process_description
 
     def _calculate_net_salary(self,
                               employee: Employee
@@ -45,6 +47,17 @@ class GrossUpService:
 
         net_salary = self._calculate_net_salary(employee)
 
+        if net_salary > employee.target_salary:
+            new_event = (
+                "No es posible generar un gross up con un salario objetivo " +
+                "menor al neto inicial\n" +
+                "--Salario neto inicial: " + net_salary + "\n"
+                "--Salario neto objetivo" + employee.target_salary + "."
+            )
+            process_event = "_first_binary_search_stage"
+            self.global_process_description.add_event(new_event, employee, 
+                                                      process_event)
+            return -1
         top = net_salary
         while net_salary < employee.target_salary:
             # Increment the gross up exponentially
@@ -113,6 +126,8 @@ class GrossUpService:
         # First stage of the binary search
         top = self._first_binary_search_stage(employee)
         bottom = 0
+        if top == -1:
+            return -1
         final_gross_up = self._second_binary_search_stage(employee, top, bottom)
 
         return final_gross_up

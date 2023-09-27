@@ -6,6 +6,7 @@ from v1_process.utils.csv_loader import load_company_employees_data, map_require
 from rest_framework.parsers import JSONParser
 
 from v1_process.services.gross_up_service import GrossUpService
+from v1_process.services.gross_up_service import GlobalProcessDescription
 from v1_process.dictionaries.dictionary import COMPANY_NIT
 from v1_process.utils.csv_mapper import map_output_csv_to_return_data
 from v1_process.services.social_security_service import SocialSecurityService
@@ -37,8 +38,10 @@ def exec_excel_pipeline(request):
         single_company_data = next(reader_company_data)
 
         employees = load_company_employees_data(single_company_data, reader_employee_data, required_dict)
-
-        gross_up_service = GrossUpService(employees, single_company_data[COMPANY_NIT])
+        global_process_description = GlobalProcessDescription()
+        gross_up_service = GrossUpService(employees,
+                                          single_company_data[COMPANY_NIT],
+                                          global_process_description)
         file_name = gross_up_service.exec()
         file_data = map_output_csv_to_return_data(file_name)
 
