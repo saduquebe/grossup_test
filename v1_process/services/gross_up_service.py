@@ -75,8 +75,11 @@ class GrossUpService:
                 social_security_values
 
             employee_copy.withholding_tax.gross_total_incomes = (
-                    employee.withholding_tax.gross_total_incomes +
-                    top
+                    employee.withholding_tax.gross_total_incomes + top
+            )
+
+            employee_copy.withholding_tax.dependent_sum = (
+                employee.withholding_tax.dependent_sum + top
             )
             # Recalculates the net salary
             net_salary = self._calculate_net_salary(employee_copy)
@@ -109,6 +112,10 @@ class GrossUpService:
             employee_copy.withholding_tax.gross_total_incomes = (
                     employee.withholding_tax.gross_total_incomes +
                     final_gross_up
+            )
+
+            employee_copy.withholding_tax.dependent_sum = (
+                employee.withholding_tax.dependent_sum + final_gross_up
             )
 
             # Recalculates the net salary
