@@ -13,8 +13,10 @@ def load_company_employees_data(single_company_data: str, employee_data: DictRea
         withholding_tax = map_to_withholding_tax(single_company_data, single_employee_data)
 
         target_salary = targets_data[single_employee_data[DOCUMENT]]
+        other_discounts = float(single_employee_data[OTHER_DISCOUNTS])
 
-        employee = Employee(social_security, withholding_tax, target_salary, single_employee_data[DOCUMENT])
+        employee = Employee(social_security, withholding_tax, target_salary,
+                            single_employee_data[DOCUMENT], other_discounts)
         employees.append(employee)
     return employees
 
