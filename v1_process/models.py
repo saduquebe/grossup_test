@@ -57,11 +57,13 @@ class SocialSecurity(models.Model):
 class Employee:
 
     def __init__(self, social_security: SocialSecurity,
-                 withholding_tax: WithholdingTax, target_salary: float, document: str):
+                 withholding_tax: WithholdingTax, target_salary: float, 
+                 document: str, other_discounts: float):
         self.social_security = social_security
         self.withholding_tax = withholding_tax
         self.target_salary = target_salary
         self.document = document
+        self.other_discounts = other_discounts
 
 
 class GrossUp:

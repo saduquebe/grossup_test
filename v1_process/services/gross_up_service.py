@@ -36,7 +36,7 @@ class GrossUpService:
 
         return (
                 base - sum(social_security_values.values()) -
-                withholding_tax_contribution
+                withholding_tax_contribution - employee.other_discounts
         )
 
     def _first_binary_search_stage(
