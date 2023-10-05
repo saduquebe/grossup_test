@@ -13,7 +13,10 @@ def get_worked_days(payroll_date, initial_date_contract, final_date_contract):
             int(payroll_date_splited[0]) == int(initial_date_splited[0])
             and int(payroll_date_splited[1]) == int(initial_date_splited[1])
     ):
-        return 30 - int(initial_date_splited[2])
+        if int(initial_date_splited[2]) == 31:
+            return 1 
+        # We must add 1 because of the day worked
+        return 30 - int(initial_date_splited[2]) + 1
 
     if (
             int(payroll_date_splited[0]) == int(final_date_splited[0])

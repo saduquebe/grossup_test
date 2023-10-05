@@ -32,8 +32,7 @@ class GrossUpService:
         withholding_tax_contribution = self.withholding_tax_service.exec(
             employee.withholding_tax)
 
-        base = employee.social_security.wage_income
-
+        base = employee.gross_incomes
         return (
                 base - sum(social_security_values.values()) -
                 withholding_tax_contribution - employee.other_discounts
@@ -45,14 +44,14 @@ class GrossUpService:
 
         employee_copy = deepcopy(employee)
 
-        net_salary = self._calculate_net_salary(employee)
+        net_salary = self._calculate_net_salary(employee_copy)
 
         if net_salary > employee.target_salary:
             new_event = (
                 "No es posible generar un gross up con un salario objetivo " +
                 "menor al neto inicial\n" +
-                "--Salario neto inicial: " + net_salary + "\n"
-                "--Salario neto objetivo" + employee.target_salary + "."
+                "--Salario neto inicial: " + str(net_salary) + "\n"
+                "--Salario neto objetivo" + str(employee.target_salary) + "."
             )
             process_event = "_first_binary_search_stage"
             self.global_process_description.add_event(new_event, employee, 
@@ -81,6 +80,10 @@ class GrossUpService:
             employee_copy.withholding_tax.dependent_sum = (
                 employee.withholding_tax.dependent_sum + top
             )
+
+            # The gross up is added to the base incomes
+            employee_copy.gross_incomes = employee.gross_incomes + top
+
             # Recalculates the net salary
             net_salary = self._calculate_net_salary(employee_copy)
         return top
@@ -116,6 +119,11 @@ class GrossUpService:
 
             employee_copy.withholding_tax.dependent_sum = (
                 employee.withholding_tax.dependent_sum + final_gross_up
+            )
+
+            # The gross up is added to the base incomes
+            employee_copy.gross_incomes = (
+                employee.gross_incomes + final_gross_up
             )
 
             # Recalculates the net salary

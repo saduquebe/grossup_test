@@ -57,3 +57,4 @@ OUTPUT_FOLDER_PATH = 'output_files/'
 OUTPUT_FILE_GENERAL_NAME = 'gross-up'
 
 OTHER_DISCOUNTS = 'otros_descuentos'
+GROSS_INCOMES = 'salario_base'
