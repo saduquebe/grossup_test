@@ -1,6 +1,7 @@
 """
 Fill this service with   
 """
+from v1_process.dictionaries.dictionary import *
 from v1_process.services.withholding_tax_service import WithholdingTaxService
 from v1_process.services.social_security_service import SocialSecurityService
 from v1_process.models import Employee, GrossUp, GlobalProcessDescription
@@ -51,8 +52,8 @@ class GrossUpService:
             new_event = (
                 "No es posible generar un gross up con un salario objetivo " +
                 "menor al neto inicial\n" +
-                "--Salario neto inicial: " + net_salary + "\n"
-                "--Salario neto objetivo" + employee.target_salary + "."
+                "--Salario neto inicial: " + str(net_salary) + "\n"
+                "--Salario neto objetivo" + str(employee.target_salary) + "."
             )
             process_event = "_first_binary_search_stage"
             self.global_process_description.add_event(new_event, employee, 
