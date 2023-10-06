@@ -33,9 +33,7 @@ def get_ibc(wage_income, top_law_1393, unearned_income, paid_vacations,
     else:
         base = wage_income + ibc_vacations + excess_law_1393
 
-    if base < smlv:
-        bounded_base_sup = smlv
-    elif base > salary_limit * smlv:
+    if base > salary_limit * smlv:
         bounded_base_sup = salary_limit * smlv
     else:
         bounded_base_sup = base
@@ -71,12 +69,12 @@ def get_contributions(wage_income, top_law_1393, unearned_income, paid_vacations
                                                        salary_limit)
     percentage_solidarity = get_solidarity_percentage_table(bounded_base_sup, smlv,
                                                             ranges)
-    if regime_type == 4 or health_contribute == False:
+    if not health_contribute:
         health = 0
     else:
         health = bounded_base_sup * health_percentage
 
-    if regime_type == 4 or pension_contribute == False:
+    if regime_type == 4 or not pension_contribute:
         pension = 0
     else:
         pension = bounded_base_sup * pension_percentage

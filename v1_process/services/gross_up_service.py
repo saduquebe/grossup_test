@@ -1,6 +1,7 @@
 """
 Fill this service with   
 """
+from v1_process.dictionaries.dictionary import *
 from v1_process.services.withholding_tax_service import WithholdingTaxService
 from v1_process.services.social_security_service import SocialSecurityService
 from v1_process.models import Employee, GrossUp, GlobalProcessDescription
