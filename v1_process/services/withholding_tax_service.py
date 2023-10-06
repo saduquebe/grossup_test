@@ -242,7 +242,9 @@ class WithholdingTaxService:
                 withholding_tax.uvt_value,
                 worked_days
             )
-        monthly_withholding_rounded = round(monthly_withholding / 1000) * 1000
+        # The withholding must be greater than 0 and rounded to thousands
+        monthly_withholding_rounded = max(
+            round(monthly_withholding / 1000) * 1000, 0)
         return monthly_withholding_rounded
 
     def _save_to_database(self):
