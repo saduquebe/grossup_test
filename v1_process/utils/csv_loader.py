@@ -16,8 +16,8 @@ def load_company_employees_data(single_company_data: str, employee_data: DictRea
 
         employee = Employee(social_security, 
                             withholding_tax, 
-                            target_salary, 
                             float(single_employee_data[GROSS_INCOMES]),
+                            target_salary, 
                             single_employee_data[DOCUMENT], 
                             float(single_employee_data[OTHER_DISCOUNTS]))
 
