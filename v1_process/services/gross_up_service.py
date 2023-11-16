@@ -49,7 +49,8 @@ class GrossUpService:
 
         if net_salary > employee.target_salary:
             new_event = (
-                "No es posible generar un gross up con un salario objetivo " +
+                "Para el empleado " + str(employee.document) +
+                " se generón un gross up negativo pues el neto objetivo es " +
                 "menor al neto inicial\n" +
                 "--Salario neto inicial: " + str(net_salary) + "\n"
                 "--Salario neto objetivo" + str(employee.target_salary) + "."
@@ -143,8 +144,11 @@ class GrossUpService:
         top = self._first_binary_search_stage(employee)
         bottom = 0
         if top == -1:
-            return -1
-        final_gross_up = self._second_binary_search_stage(employee, top, bottom)
+            final_gross_up = self._second_binary_search_stage(
+                employee, bottom, -1  * employee.gross_incomes)
+        else:
+            final_gross_up = self._second_binary_search_stage(employee,
+                                                              top, bottom)
 
         return final_gross_up
 

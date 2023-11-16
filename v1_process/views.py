@@ -47,7 +47,6 @@ def exec_excel_pipeline(request):
 
         response = HttpResponse(file_data, content_type='application/vnd.ms-excel')
         response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-
     return response
 
 @csrf_exempt
